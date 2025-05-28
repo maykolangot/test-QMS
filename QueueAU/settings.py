@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-%mhsz76ph5v_8^xl8wj$zo=wz&#-cyv_*dirc%p_p9oe#%_!ui
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','https://test-qms-hf04.onrender.com/']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','test-qms-hf04.onrender.com/']
 
 # Application definition
 
