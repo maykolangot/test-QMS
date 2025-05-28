@@ -1,0 +1,127 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Student</title>
+     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+<div class="registration-wrapper">
+    <div class="registration-card">
+        <h1>Registration</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+        <div style="display: flex; justify-content: center; margin-top: 1rem;">
+            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+        </div>
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
+<style>
+    body {
+        background-image: url("{% static 'images/bg.png' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .registration-wrapper {
+        display: flex;
+        justify-content: flex-start; /* Align to the left */
+        align-items: center;
+        height: 100vh;
+        padding-left: 5%; /* Adjust spacing from the left edge */
+    }
+
+    .registration-card {
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .registration-card h1 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .registration-card form p {
+        margin-bottom: 1rem;
+    }
+
+    .registration-card input,
+    .registration-card select,
+    .registration-card textarea {
+        font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+    height: 32px;
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+
+    .registration-card label {
+        font-weight: 500;
+        margin-bottom: 0.3rem;
+        display: block;
+    }
+
+    .registration-card button[type="submit"] {
+        width: 100%;
+        margin-top: 1rem;
+        padding: 0.6rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 6px;
+        background-color: #007bff;
+        color: white;
+        transition: background-color 0.3s;
+    }
+
+    .registration-card button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function () {
+        $('#id_department').change(function () {
+            var url = "{% url 'ajax_load_courses' %}";  // You'll define this in urls.py
+            var departmentId = $(this).val();
+
+            $.ajax({
+                url: url,
+                data: {
+                    'department_id': departmentId
+                },
+                success: function (data) {
+                    var $course = $("#id_course");
+                    $course.empty();
+                    $course.append('<option value="">Select Course</option>');
+                    $.each(data, function (key, value) {
+                        $course.append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+                }
+            });
+        });
+    });
+</script>
