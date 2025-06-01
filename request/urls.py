@@ -16,9 +16,14 @@ urlpatterns = [
     path('ajax/load-courses/', load_courses, name='ajax_load_courses'),
     path('student_register/', register_student, name='register_student'),
     path('student/success/<int:student_id>/', student_success, name='student_success'),
-    path('new-enrollee/', register_new_enrollee, name='register_new_enrollee'),
-    path('guest/', register_guest, name='register_guest'),
-    path('queue-request/', request_queue, name='request_queue'),
+
+
+    # Closed Path from Web, must be in the Local Server 
+    # path('new-enrollee/', register_new_enrollee, name='register_new_enrollee'),
+    # path('guest/', register_guest, name='register_guest'),
+    # path('queue-request/', request_queue, name='request_queue'),
+
+    
     path('cashier_register/',register_view, name='register'),
     path('', index, name='index'),
     path("live-queue/", live_queue_status, name="live-queue-status"),
