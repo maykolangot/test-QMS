@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import handler404
+from django.shortcuts import render
 
 
 urlpatterns = [
@@ -23,7 +25,13 @@ urlpatterns = [
     path('user/', include('django.contrib.auth.urls')),
     path('user/', include('user.urls')),
     path('', include('request.urls')),
-
-    
-    
 ]
+
+def custom_404(request, exception):
+    try:
+        return render(request, '404.html', status=404)
+    except Exception as e:
+        from django.http import HttpResponse
+        return HttpResponse(f'404 fallback error: {e}', status=500)
+
+handler404 = custom_404
