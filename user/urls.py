@@ -51,12 +51,6 @@ urlpatterns = [
     path('settings/content/', views.cashier_settings_content, name='cashier_settings_content'),
 
 
-
-    # Admin Dashboard
-    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
-
-
-
     # Admin Navigation Bar
     path('admin/dashboard/dashboard_summary/', views.admin_dashboard_summary, name='admin_dashboard_summary'),
 
