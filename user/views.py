@@ -107,7 +107,7 @@ def verify_2fa(request):
             request.session.pop('2fa_user_id', None)
 
             if user.isAdmin:
-                return redirect('admin_dashboard')
+                return redirect('admin_dashboard_summary')
             else:
                 return redirect('cashier')
         else:
