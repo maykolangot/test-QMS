@@ -39,7 +39,7 @@ def print_queue_slip(queue_number, transaction_type):
 
         ep_out.write(b'\x1b\x21\x00')  # Normal font
         ep_out.write("PHINMA Araullo University's\n".encode('utf-8'))
-        ep_out.write("Queueing Management System\n\n".encode('utf-8'))
+        ep_out.write("Queue Ticketing System\n\n".encode('utf-8'))
 
 
         ep_out.write("--------------------------------\n".encode('utf-8'))
