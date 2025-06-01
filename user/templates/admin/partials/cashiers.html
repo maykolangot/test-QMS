@@ -1,0 +1,139 @@
+{% extends 'admin/dashboard-admin.html' %}
+
+{% block content %}
+<div class="container my-4">
+
+    <!-- Section Header for Verified Cashiers -->
+    <div class="mb-5">
+        <h3 class="text-success mb-4"><strong>Verified Cashiers</strong></h3>
+        <div class="table-responsive shadow-sm rounded-3">
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Window #</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cashier in verified_cashiers %}
+                    <tr>
+                        <td>
+                            <a href="#" class="text-decoration-none" 
+                               onclick="loadCashierTransactions('{% url 'cashier_transactions' cashier.id %}', '{{ cashier.name|escapejs }}')">
+                               {{ cashier.name }}
+                            </a>
+                        </td>
+                        <td>{{ cashier.email }}</td>
+                        <td>{{ cashier.windowNum }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-2" onclick="editCashier({{ cashier.id }})" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCashier({{ cashier.id }})" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section Header for Unverified Cashiers -->
+    <div class="mb-5">
+        <h3 class="text-secondary mb-4"><strong>Unverified Cashiers</strong></h3>
+        <div class="table-responsive shadow-sm rounded-3">
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Window #</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cashier in non_verified_cashiers %}
+                    <tr>
+                        <td>{{ cashier.name }}</td>
+                        <td>{{ cashier.email }}</td>
+                        <td>{{ cashier.windowNum }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success me-2" onclick="verifyCashier({{ cashier.id }})">
+                                <i class="bi bi-check-circle me-1"></i> Verify
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCashier({{ cashier.id }})" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing Cashier Transactions -->
+    <div class="modal fade" id="cashierTransactionModal" tabindex="-1" aria-labelledby="cashierTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="cashierTransactionModalLabel">Cashier Transactions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="cashier-transactions-content">
+                    <!-- Transaction content loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Editing Cashier -->
+    <div class="modal fade" id="cashierEditModal" tabindex="-1" aria-labelledby="cashierEditModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="cashierEditModalLabel">Edit Cashier</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="cashierEditModalContent">
+                    <!-- Form content injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+
+   // ✅ MAIN: Load Modal and Populate Dropdowns
+   function loadCashierTransactions(url, name) {
+       currentCashierUrl = url;
+       currentCashierName = name;
+   
+       fetch(url)
+           .then(response => {
+               if (!response.ok) throw new Error("Failed to load transactions");
+               return response.text();
+           })
+           .then(html => {
+               document.getElementById("cashierTransactionModalLabel").textContent = `Transactions for ${name}`;
+               document.getElementById("cashier-transactions-content").innerHTML = html;
+               new bootstrap.Modal(document.getElementById('cashierTransactionModal')).show();
+   
+           })
+           .catch(err => {
+               console.error("Error fetching transactions:", err);
+               document.getElementById("cashier-transactions-content").innerHTML = `<div class='alert alert-danger'>Could not load transactions.</div>`;
+               new bootstrap.Modal(document.getElementById('cashierTransactionModal')).show();
+           });
+   }
+   
+</script>
+
+{% endblock %}

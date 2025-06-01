@@ -1,0 +1,84 @@
+{% extends 'admin/dashboard-admin.html' %}
+
+
+{% block content %}
+
+<div class="container my-4">
+    <!-- Page Header -->
+    <h2 class="fw-bold mb-4">
+Transaction Cutoff Settings
+    </h2>
+
+    <!-- Alert Message -->
+    {% if message %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message|safe }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <!-- Cutoff Form -->
+    <form method="post" class="card shadow-sm p-4 mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="campus" class="form-label fw-semibold">Campus <span class="text-muted">(leave blank = all)</span></label>
+            <select name="campus" id="campus" class="form-select">
+                {% for c in campuses %}
+                    <option value="{{ c }}">{{ c|default:"All" }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="cutoff_time" class="form-label fw-semibold">Cutoff Time</label>
+            <input type="datetime-local" name="cutoff_time" id="cutoff_time" class="form-control">
+            <small class="text-muted">Leave blank to apply cutoff immediately</small>
+        </div>
+
+        <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-danger" style="width: 20%;">
+                        <i class="bi bi-scissors"></i> Submit Cutoff
+                    </button>
+                </div>
+    </form>
+
+    <!-- Divider -->
+    <hr class="my-4">
+
+    <!-- Today's Cutoffs Table -->
+    <h3 class="fw-semibold mb-3">Today's Cutoffs</h3>
+
+    {% if cutoffs_today %}
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Campus</th>
+                    <th scope="col">Cutoff Time</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cutoff in cutoffs_today %}
+                <tr>
+                    <td>{{ cutoff.campus|default:"All" }}</td>
+                    <td>{{ cutoff.cutoff_time|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        {% if cutoff.is_cutoff %}
+                            <span class="badge bg-success">Executed</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Scheduled</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-muted">No cutoffs recorded today.</p>
+    {% endif %}
+</div>
+
+
+{% endblock %}

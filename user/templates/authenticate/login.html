@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    body {
+      background-image: url("{% static 'images/bg.png' %}");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .registration-wrapper {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      height: 100vh;
+      padding-left: 5%;
+    }
+
+    .registration-card {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .registration-card h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .registration-card .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .registration-card input {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.5rem;
+      height: 32px;
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+    }
+
+    .registration-card label {
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+
+    /* Styled submit button */
+    .registration-card button[type="submit"] {
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0069d9 0%, #0053a6 100%);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 105, 217, 0.3);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.1s, box-shadow 0.3s;
+    }
+
+    .registration-card button[type="submit"]:hover {
+      background: linear-gradient(135deg, #0053a6 0%, #003f7f 100%);
+      box-shadow: 0 6px 16px rgba(0, 63, 127, 0.4);
+    }
+
+    .registration-card button[type="submit"]:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 8px rgba(0, 63, 127, 0.5);
+    }
+
+    .message-container {
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      background-color: #e9f7ef;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      font-size: 0.9rem;
+    }
+
+    .message-container.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border-color: #f5c6cb;
+    }
+
+    .message-container.warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border-color: #ffeeba;
+    }
+
+    .message-container.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border-color: #bee5eb;
+    }
+    .form-group.centered {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+  </style>
+</head>
+<body>
+  <div class="registration-wrapper">
+    <div class="registration-card">
+      <h1>Login</h1>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="message-container {{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" action="">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input id="email" type="email" name="email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" name="password" class="form-control" required>
+          <div style="text-align: right; margin-top: .25rem;">
+            <a href="{% url 'forgot_password' %}" style="font-size:.85rem;color:#007bff">
+              Forgot password?
+            </a>
+          </div>
+        </div>
+
+        <div class="form-group centered">
+          <div class="g-recaptcha" data-sitekey="{{ site_key }}"></div>
+        </div>
+
+
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</body>
+</html>
