@@ -1976,16 +1976,17 @@ def sem_transaction_type_grouped_chart(request):
 
     tx_types = ["P1", "P2", "P3"]
     sems = ["Sem 1", "Sem 2", "Summer"]
-
+    
     series = []
-    for sem in sems:
-        data = [grouped[sem].get(tx_type, 0) for tx_type in tx_types]
-        series.append({"name": sem, "data": data})
-
+    for tx_type in tx_types:
+        data = [grouped[sem].get(tx_type, 0) for sem in sems]
+        series.append({"name": tx_type, "data": data})
+    
     return JsonResponse({
-        "categories": tx_types,
+        "categories": sems,
         "series": series
     })
+
 
 
 from collections import Counter
