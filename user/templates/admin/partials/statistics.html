@@ -192,6 +192,33 @@
       
     </div>
   </div>
+
+  
+  <!-- Row 5: Heatmap -->
+  <div class="row mb-4">
+
+    <div class="card mt-4">
+    <div class="card-header">
+        <h5>Average Processing Time</h5>
+    </div>
+    <div class="card-body">
+        <p id="averageProcessingTime">Loading...</p>
+    </div>
+    </div>
+
+  </div>
+
+  <div>
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Transaction Type per Term</h5>
+        </div>
+        <div class="card-body">
+            <div id="semTxGroupedChart"></div>
+        </div>
+    </div>
+
+  </div>
 <!-- Single Spinner for All Charts -->
 <!-- Single Spinner for All Charts -->
 <div id="global-spinner">
@@ -305,10 +332,13 @@ function loadStatistics() {
     safeFetch(`status-by-department/?${params}`),
     safeFetch(`heatmap-time/?${params}`),
     safeFetch(`heatmap-hourly/?${params}`),
-    safeFetch(`forecast/?${params}`)
+    safeFetch(`forecast/?${params}`),
+    safeFetch(`avg-processing-time/?${params}`),
+    safeFetch(`sem-tx-grouped/?${params}`)
+
   ])
     .then((
-      [transactionsData, typesData, donutData, deptStatusData, heatmapTimeData, heatmapByHourData, forecastData]
+      [transactionsData, typesData, donutData, deptStatusData, heatmapTimeData, heatmapByHourData, forecastData, avgTimeData, semGroupedData]
     ) => {
       return Promise.all([
         renderChart(transactionsData),
@@ -317,7 +347,9 @@ function loadStatistics() {
         renderStatusByDepartmentChart(deptStatusData),
         renderTransactionHeatmapTime(heatmapTimeData),
         renderTransactionHeatmapByHour(heatmapByHourData),
-        renderForecastChart(forecastData)
+        renderForecastChart(forecastData),
+        renderAverageTime(avgTimeData), // << NEW
+        renderSemTransactionGroupedChart(semGroupedData) // << NEW
       ]);
     })
     .catch(err => console.error("Failed to load stats:", err))
@@ -331,6 +363,45 @@ document.addEventListener('DOMContentLoaded', () => {
   loadStatistics();
 });
 
+
+// New Stats:
+
+function renderAverageTime(avgTimeData) {
+  const container = document.getElementById("averageProcessingTime");
+  container.textContent = `${avgTimeData.average_minutes} minutes`;
+}
+
+
+function renderSemTransactionGroupedChart(data) {
+  const options = {
+    chart: {
+      type: 'bar',
+      height: 400,
+      stacked: false
+    },
+    title: {
+      text: 'Transactions by Term and Type'
+    },
+    xaxis: {
+      categories: data.categories
+    },
+    yaxis: {
+      title: { text: 'Transaction Count' }
+    },
+    series: data.series,
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        dataLabels: {
+          position: 'top'
+        }
+      }
+    }
+  };
+
+  const chart = new ApexCharts(document.querySelector("#semTxGroupedChart"), options);
+  chart.render();
+}
 
 
 

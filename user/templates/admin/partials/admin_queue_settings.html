@@ -18,7 +18,7 @@ Transaction Cutoff Settings
     {% endif %}
 
     <!-- Cutoff Form -->
-    <form method="post" class="card shadow-sm p-4 mb-4">
+    <form id="cutoffForm" method="post" class="card shadow-sm p-4 mb-4">
         {% csrf_token %}
         <div class="mb-3">
             <label for="campus" class="form-label fw-semibold">Campus <span class="text-muted">(leave blank = all)</span></label>
@@ -36,9 +36,10 @@ Transaction Cutoff Settings
         </div>
 
         <div class="d-flex justify-content-center">
-                    <button type="submit" class="btn btn-danger" style="width: 20%;">
-                        <i class="bi bi-scissors"></i> Submit Cutoff
-                    </button>
+        <button type="button" class="btn btn-danger" style="width: 20%;" data-bs-toggle="modal" data-bs-target="#confirmCutoffModal">
+            <i class="bi bi-scissors"></i> Submit Cutoff
+        </button>
+
                 </div>
     </form>
 
@@ -79,6 +80,34 @@ Transaction Cutoff Settings
     <p class="text-muted">No cutoffs recorded today.</p>
     {% endif %}
 </div>
+
+<!-- Redesigned Confirmation Modal -->
+<div class="modal fade" id="confirmCutoffModal" tabindex="-1" aria-labelledby="confirmCutoffModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header bg-gradient text-white rounded-top-4 px-4 py-3" style="background: linear-gradient(135deg, #f9a825, #f57c00);">
+        <h5 class="modal-title fw-semibold" id="confirmCutoffModalLabel">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Cutoff
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center px-5 py-4">
+        <p class="fs-5 mb-2">
+          <i class="bi bi-exclamation-circle text-warning fs-3 d-block mb-2"></i>
+          <strong>Warning:</strong> This action is <u>irreversible</u>.
+        </p>
+        <p class="text-muted mb-0">Are you absolutely sure you want to apply the cutoff?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pb-4">
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-danger px-4" form="cutoffForm">Yes, Apply Cutoff</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 
 {% endblock %}

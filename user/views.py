@@ -1001,7 +1001,8 @@ def admin_queue_settings(request):
                 )
             updated_legacy = legacy_txns.update(status=Transaction.Status.CUT_OFF)
 
-            logger.info(f"Applied immediate cutoff → NF1: {updated_nf1}, Legacy: {updated_legacy}")
+            logger.info(f"Applied immediate cutoff -> NF1: {updated_nf1}, Legacy: {updated_legacy}")
+
             message = (
                 f"✅ Cutoff applied for <strong>{campus or 'All Campuses'}</strong> at "
                 f"<strong>{cutoff_time_ph.strftime('%Y-%m-%d %H:%M')}</strong>.<br>"
@@ -1080,6 +1081,36 @@ def cashier_list_view(request):
     }
     return render(request, "admin/partials/list.html", context)
 
+def verify_cashier(request, cashier_id):
+    if request.method == "POST":
+        cashier = get_object_or_404(User, id=cashier_id, verified=False)
+        cashier.verified = True
+        cashier.save()
+        
+        # Send verification email
+        send_mail(
+            subject="Verification Successful",
+            message=f"Dear {cashier.name},\n\nYour cashier account has been verified and approved by the admin.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[cashier.email],
+        )
+        messages.success(request, f"{cashier.name} has been verified.")
+    return redirect('cashier_list')
+
+def reject_cashier(request, cashier_id):
+    if request.method == "POST":
+        cashier = get_object_or_404(User, id=cashier_id, verified=False)
+        
+        # Send rejection email before deletion
+        send_mail(
+            subject="Verification Rejected",
+            message=f"Dear {cashier.name},\n\nWe regret to inform you that your cashier account has been rejected by the admin.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[cashier.email],
+        )
+        cashier.delete()
+        messages.success(request, f"{cashier.name} has been rejected and deleted.")
+    return redirect('cashier_list')
 
 def cashier_transactions_view(request, cashier_id):
     user_id = request.session.get('user_id')
@@ -1859,6 +1890,101 @@ def forecast_chart_data(request):
         "labels": labels,
         "series": values,
         "actual_today": today_actual
+    })
+
+
+from django.db.models import F, ExpressionWrapper, DurationField, Avg
+from django.db.models.functions import Now
+
+def average_processing_time_view(request):
+    # Filters (same as others)
+    campus = request.GET.get("campus")
+    department = request.GET.get("department")
+    course = request.GET.get("course")
+    year = request.GET.get("year")
+    txn_for = request.GET.get("transaction_for")
+    time_filter = request.GET.get("time", "last_7_days")
+
+    date_range = get_date_range(time_filter)
+    if not date_range:
+        return JsonResponse({"average_minutes": 0})
+
+    queryset = TransactionNF1.objects.filter(
+        status=TransactionNF1.Status.COMPLETED,
+        created_at__date__in=date_range
+    )
+
+    if campus:
+        queryset = queryset.filter(campus__iexact=campus)
+    if department:
+        queryset = queryset.filter(course__department__id=department)
+    if course:
+        queryset = queryset.filter(course__id=course)
+    if year:
+        queryset = queryset.filter(student__year_level=year)
+    if txn_for:
+        queryset = queryset.filter(transaction_for=txn_for)
+
+    queryset = queryset.annotate(
+        processing_time=ExpressionWrapper(F('updated_at') - F('created_at'), output_field=DurationField())
+    )
+
+    avg_duration = queryset.aggregate(avg=Avg('processing_time'))['avg']
+
+    if avg_duration:
+        avg_minutes = round(avg_duration.total_seconds() / 60, 2)
+    else:
+        avg_minutes = 0
+
+    return JsonResponse({"average_minutes": avg_minutes})
+
+
+def sem_transaction_type_grouped_chart(request):
+    valid_sems = ["sem_1", "sem_2", "summer"]
+    valid_tx_types = ["P1", "P2", "P3"]
+
+    campus = request.GET.get("campus")
+    department = request.GET.get("department")
+    course = request.GET.get("course")
+    year = request.GET.get("year")
+    time_filter = request.GET.get("time", "last_7_days")
+
+    date_range = get_date_range(time_filter)
+    queryset = TransactionNF1.objects.filter(
+        status=TransactionNF1.Status.COMPLETED,
+        transaction_for__in=valid_sems,
+        transactionType__in=valid_tx_types,
+        created_at__date__in=date_range
+    )
+
+    if campus:
+        queryset = queryset.filter(campus__iexact=campus)
+    if department:
+        queryset = queryset.filter(course__department__id=department)
+    if course:
+        queryset = queryset.filter(course__id=course)
+    if year:
+        queryset = queryset.filter(student__year_level=year)
+
+    from collections import defaultdict
+    grouped = defaultdict(lambda: defaultdict(int))  # sem -> tx_type -> count
+
+    for txn in queryset:
+        sem = txn.transaction_for.title().replace("_", " ")  # "sem_1" → "Sem 1"
+        tx_type = txn.transactionType.upper()
+        grouped[sem][tx_type] += 1
+
+    tx_types = ["P1", "P2", "P3"]
+    sems = ["Sem 1", "Sem 2", "Summer"]
+
+    series = []
+    for sem in sems:
+        data = [grouped[sem].get(tx_type, 0) for tx_type in tx_types]
+        series.append({"name": sem, "data": data})
+
+    return JsonResponse({
+        "categories": tx_types,
+        "series": series
     })
 
 

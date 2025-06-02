@@ -51,6 +51,7 @@ urlpatterns = [
     path('settings/content/', views.cashier_settings_content, name='cashier_settings_content'),
 
 
+
     # Admin Navigation Bar
     path('admin/dashboard/dashboard_summary/', views.admin_dashboard_summary, name='admin_dashboard_summary'),
 
@@ -67,6 +68,9 @@ urlpatterns = [
     path("admin/dashboard/statistics/heatmap-time/", views.heatmap_chart_data, name='heatmap_chart_data'),
     path("admin/dashboard/statistics/heatmap-hourly/", views.hourly_heatmap_chart_data, name="hourly_heatmap_chart_data"),
     path("admin/dashboard/statistics/forecast/", views.forecast_chart_data, name="forecast_chart_data"),
+    path("admin/dashboard/statistics/avg-processing-time/", views.average_processing_time_view, name="average_processing_time_view"),
+    path("admin/dashboard/statistics/sem-tx-grouped/", views.sem_transaction_type_grouped_chart, name="sem_transaction_type_grouped_chart"),
+
 
 
 
@@ -87,14 +91,12 @@ urlpatterns = [
 
 
     # verified and non verified
-    path('admin/dashboard/cashiers/<int:cashier_id>/verify/', views.verify_cashier, name='verify_cashier'),
-    path("admin/dashboard/cashiers/verify/<int:pk>/", views.verify_cashier, name="cashier_verify"),
-
-
     # Cashier Transaction
 
-
     path("admin/dashboard/cashiers/list/", views.cashier_list_view, name="cashier_list"),
+    path("admin/dashboard/cashiers/verify/<int:cashier_id>/", views.verify_cashier, name="cashier_verify"),
+    path("admin/dashboard/cashiers/reject/<int:cashier_id>/", views.reject_cashier, name="cashier_reject"),
+
     path("admin/dashboard/cashiers/list/<int:cashier_id>/transactions/", views.cashier_transactions_view, name="cashier_transactions"),
     path("admin/dashboard/cashiers/list/<int:cashier_id>/edit/", views.cashier_update_view, name="cashier_update"),
     path("admin/dashboard/cashiers/list/<int:cashier_id>/delete/", views.cashier_delete_view, name="cashier_delete"),
